@@ -1,0 +1,183 @@
+<title>Experiment: Anchored Scroll</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .hero,
+  .projects,
+  .other-stuff,
+  .events,
+  .footer-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    scroll-margin-top: 45px;
+  }
+
+  .exp-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: black;
+    color: white;
+    font-family: var(--sans);
+    font-size: 13px;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .exp-banner a {
+    color: white;
+    text-decoration: underline;
+    margin-left: 8px;
+  }
+
+  .page {
+    padding-top: 100px;
+  }
+</style>
+
+<div class="exp-banner">
+  Experiment: anchored / snap scroll — each section locks into place as you scroll.
+  <a href="../index.html">Back to normal landing page →</a>
+</div>
+
+<div class="page">
+  <aside class="sidebar">
+    <div class="sidebar__photo">
+      <img src="../assets/images/profile-photo.jpg" alt="Chris Tae Seo Lee" />
+    </div>
+    <nav class="sidebar__nav">
+      <a href="#projects">projects →</a>
+      <a href="#other-stuff">other stuff →</a>
+      <a href="../about.html">about me →</a>
+      <a href="../contact.html">contact →</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <section class="hero">
+      <p class="hero__name">Chris Tae Seo Lee</p>
+      <div class="hero__body">
+        <p class="hero__tagline">
+          <span class="star">
+            Product designer with 6
+            <img src="../assets/images/star.svg" alt="" />
+          </span>
+          years of experience
+        </p>
+        <p>Previously @ Early, Growing, Unicorn Startups</p>
+        <p>Experience in travel app, video-streaming app, and coding education</p>
+        <p>Pursuing Master of Design, Interaction @ Carnegie Mellon</p>
+        <p>Graduated in Cornell</p>
+      </div>
+    </section>
+
+    <section class="projects" id="projects">
+      <div class="section-heading">
+        <h2>Projects</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="project-list">
+        <article class="project">
+          <div class="project__frame">
+            <img class="project__shot" src="../assets/images/hotel-card.png" alt="Redesigned hotel list card" />
+          </div>
+          <div class="project__meta">
+            <h3 class="project__title">Redesigning Hotel List Cards for Travelers</h3>
+            <div class="project__stats">
+              <div class="headline">
+                <p>+15% Revenue</p>
+                <p>Product Design Lead</p>
+              </div>
+              <p class="tags">A/B Testing | User Experience | Information Architecture</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="project">
+          <div class="project__frame project__frame--phone">
+            <div class="phone-outline">
+              <video src="../assets/video/live-chat-demo.mp4" muted loop playsinline preload="metadata"></video>
+            </div>
+          </div>
+          <div class="project__meta">
+            <h3 class="project__title">Redesigning the Help Center &amp; Live-Chat</h3>
+            <div class="project__stats">
+              <div class="headline">
+                <p>+15% Revenue</p>
+                <p>Product Design Lead</p>
+              </div>
+              <p class="tags">A/B Testing | User Experience | Information Architecture</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="other-stuff" id="other-stuff">
+      <div class="other-stuff__head">
+        <div class="section-heading">
+          <h2>Other Stuff</h2>
+          <div class="line"></div>
+        </div>
+        <p class="other-stuff__subhead">Empowerment to Designers</p>
+      </div>
+
+      <div class="other-stuff__body">
+        <div class="other-stuff__photo" title="Add a conference photo here"></div>
+
+        <div class="other-stuff__list">
+          <div class="other-stuff__item">
+            <h3>UX Conference Speaker &amp; Organizer for Junior Designers</h3>
+            <p class="meta">400 applicants | 10 live sessions @ YEOGI</p>
+          </div>
+
+          <div class="other-stuff__item">
+            <h3>3 UX Blog Posts</h3>
+            <p class="meta">N total viewerships | N scraps</p>
+            <div class="links">
+              <a href="https://techblog.gccompany.co.kr/30%EB%B2%88-%EC%8B%A4%ED%97%98-%EB%81%9D%EC%97%90-%EC%84%B1%EA%B3%B5%ED%95%9C-%EC%97%AC%EA%B8%B0%EC%96%B4%EB%95%8C-%EC%83%81%ED%92%88-%EC%B9%B4%EB%93%9C-ui-%EA%B0%9C%EC%84%A0%EA%B8%B0-1c30ab8f0dfc" target="_blank" rel="noopener">30 Experiments, One Success: Improving the Product Card Design →</a>
+              <a href="https://techblog.gccompany.co.kr/a-b-%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EC%8B%A4%ED%8C%A8%ED%95%B4%EB%8F%84-%EA%B4%9C%EC%B0%AE%EC%9D%80-%EC%9D%B4%EC%9C%A0-c1ace9169823" target="_blank" rel="noopener">It's Fine to Fail in A/B Testing - Here's Why →</a>
+              <a href="https://medium.com/@ux-blog/%EB%8B%A4%EB%A5%B8-%ED%8C%80%EC%9D%98-%EA%B3%A0%EB%AF%BC%EC%9D%80-%EC%96%B4%EB%96%BB%EA%B2%8C-%EC%9A%B0%EB%A6%AC%EC%9D%98-%EB%8B%B5%EC%9D%B4-%EB%90%A0%EA%B9%8C-cf81fb21681c" target="_blank" rel="noopener">Arranging Cross-industry workshops →</a>
+            </div>
+          </div>
+
+          <div class="other-stuff__item">
+            <h3>Mentor &amp; Mentee Programs</h3>
+            <p class="meta">4 months of intense feedback sessions for mentees @ <a href="https://zero-base.co.kr/" target="_blank" rel="noopener" style="text-decoration: underline;">ZeroBase Academy</a></p>
+          </div>
+
+          <div class="other-stuff__item">
+            <h3>Live-lecture for non-design major students</h3>
+            <p class="meta">200 non-design major attendees | reviewed on 3 blogs @ZeroBase Academy</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="events">
+      <p class="events__title">Experiential Design for Events</p>
+      <div class="events__grid">
+        <div class="g1"><img src="../assets/images/event-1.jpg" alt="Event design 1" /></div>
+        <div class="g2"><img src="../assets/images/event-2.jpg" alt="Event design 2" /></div>
+        <div class="g3"><img src="../assets/images/event-3.jpg" alt="Event design 3" /></div>
+        <div class="g4"><img src="../assets/images/event-4.jpg" alt="Event design 4" /></div>
+        <div class="g5"><img src="../assets/images/event-5.jpg" alt="Event design 5" /></div>
+        <div class="g6"><img src="../assets/images/event-6.jpg" alt="Event design 6" /></div>
+      </div>
+    </section>
+
+    <section class="footer-section">
+      <p class="footer-cta">maybe we can put future works made with you, <a href="mailto:christaeseo@gmail.com">email me →</a></p>
+    </section>
+  </main>
+</div>
+<script src="../js/hover-video.js"></script>

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "/Users/christaeseo/Documents/2026 portfolio web", "-p", "4173", "-c-1"],
+      "port": 4173
+    }
+  ]
+}

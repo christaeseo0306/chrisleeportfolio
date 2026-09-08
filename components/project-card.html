@@ -1,0 +1,239 @@
+<title>Component: Project Card</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+  body {
+    padding: 60px 40px 100px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .lab-header {
+    margin-bottom: 48px;
+  }
+
+  .lab-header h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 40px;
+    margin: 0 0 8px;
+  }
+
+  .lab-header p {
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.55);
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .lab-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .lab-controls button {
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: white;
+    cursor: pointer;
+  }
+
+  .lab-controls button.active {
+    background: black;
+    color: white;
+    border-color: black;
+  }
+
+  .lab-section {
+    margin-bottom: 72px;
+  }
+
+  .lab-section h2 {
+    font-family: var(--sans);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(0, 0, 0, 0.45);
+    margin: 0 0 20px;
+  }
+
+  .lab-stage {
+    resize: horizontal;
+    overflow: auto;
+    max-width: 100%;
+    min-width: 280px;
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    padding: 24px;
+  }
+
+  .lab-stage-hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.4);
+    margin: 8px 0 0;
+  }
+
+  .variant-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 720px) {
+    .variant-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Video/gif loop thumbnail prototype */
+  .media-wrap {
+    position: relative;
+    max-width: 46%;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .media-wrap img,
+  .media-wrap video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .media-wrap video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .media-wrap.has-media video {
+    opacity: 1;
+  }
+
+  .media-wrap.has-media img {
+    opacity: 0;
+  }
+
+  .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .upload-row input[type="file"] {
+    font-size: 13px;
+  }
+
+  .upload-hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+</style>
+
+<div class="lab-header">
+  <h1>Project Card</h1>
+  <p>Isolated playground for the <code>.project__frame</code> component used in the Projects section. Hover and click the cards to try the current interaction states. Drag the bottom-right corner of the dashed box to test resize behavior.</p>
+</div>
+
+<div class="lab-section">
+  <h2>Variants</h2>
+  <div class="variant-grid">
+    <div>
+      <div class="project__frame">
+        <img class="project__shot" src="../assets/images/hotel-card.png" alt="Redesigned hotel list card" />
+      </div>
+    </div>
+    <div>
+      <div class="project__frame project__frame--phone">
+        <div class="phone-outline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lab-section">
+  <h2>Resize test</h2>
+  <div class="lab-stage">
+    <div class="project__frame">
+      <img class="project__shot" src="../assets/images/hotel-card.png" alt="Redesigned hotel list card" />
+    </div>
+  </div>
+  <p class="lab-stage-hint">Drag the ↘ corner to check the frame at different widths (aspect-ratio should hold).</p>
+</div>
+
+<div class="lab-section">
+  <h2>Hover to play — Live-Chat project</h2>
+  <div class="project__frame project__frame--phone">
+    <div class="phone-outline">
+      <video id="liveChatVideo" src="../assets/video/live-chat-demo.mp4" muted loop playsinline preload="metadata"></video>
+    </div>
+  </div>
+  <p class="lab-stage-hint">Hover the frame to play — the real exported Figma clip, cropped to the phone screen already, so it scrolls up/down naturally as the conversation plays. Mouse out pauses and resets to frame 0.</p>
+</div>
+
+<div class="lab-section">
+  <h2>Hover to play — any card</h2>
+  <div class="upload-row">
+    <input type="file" id="mediaInput" accept="video/*,image/gif" />
+    <span class="upload-hint">Drop in an .mp4/.webm or a .gif to try the same hover-to-play behavior with your own clip.</span>
+  </div>
+  <div class="project__frame">
+    <div class="media-wrap" id="mediaWrap">
+      <img id="mediaPoster" class="project__shot" src="../assets/images/hotel-card.png" alt="Redesigned hotel list card" />
+      <video id="mediaVideo" muted loop playsinline preload="none"></video>
+    </div>
+  </div>
+  <p class="lab-stage-hint" id="mediaStatus">No shadow, no size/scale change — hover plays the video, mouse out pauses and resets it.</p>
+</div>
+
+<div class="lab-section">
+  <h2>Interaction notes</h2>
+  <p style="font-size: 14px; line-height: 1.6; max-width: 620px;">
+    Hover plays the video (or gif); mouse-out pauses and resets to the start. No drop shadow, no hover-triggered resize. The card markup gains one wrapper (<code>.media-wrap</code> or <code>.phone-outline</code>) so the video sits exactly in place. This same pattern is now live on the real site's Live-Chat project card.
+  </p>
+</div>
+
+<script>
+  function wireHoverPlay(video) {
+    const frame = video.closest('.project__frame');
+    frame.addEventListener('mouseenter', () => video.play());
+    frame.addEventListener('mouseleave', () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+  }
+
+  wireHoverPlay(document.getElementById('liveChatVideo'));
+  wireHoverPlay(document.getElementById('mediaVideo'));
+
+  const input = document.getElementById('mediaInput');
+  const wrap = document.getElementById('mediaWrap');
+  const video = document.getElementById('mediaVideo');
+  const status = document.getElementById('mediaStatus');
+
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+
+    if (file.type === 'image/gif') {
+      document.getElementById('mediaPoster').src = url;
+      status.textContent = 'GIF loaded (gifs animate natively — hover just previews it in place).';
+    } else {
+      video.src = url;
+      wrap.classList.add('has-media');
+      status.textContent = 'Video loaded — hover the card to play, mouse out to pause and reset.';
+    }
+  });
+</script>
