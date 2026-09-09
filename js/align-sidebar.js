@@ -15,8 +15,13 @@ function positionSidebar() {
 
 window.addEventListener("load", positionSidebar);
 
+// Window "resize" and a ResizeObserver on the document are complementary:
+// some viewport-size changes (e.g. certain DevTools device-toolbar drags)
+// only trigger one or the other, so both are wired to the same debounce.
 let sidebarResizeTimer;
-window.addEventListener("resize", () => {
+function scheduleSidebarReposition() {
   clearTimeout(sidebarResizeTimer);
   sidebarResizeTimer = setTimeout(positionSidebar, 100);
-});
+}
+window.addEventListener("resize", scheduleSidebarReposition);
+new ResizeObserver(scheduleSidebarReposition).observe(document.documentElement);

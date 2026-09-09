@@ -389,10 +389,15 @@
     target.addEventListener("focus", play);
     target.addEventListener("blur", stop);
 
-    window.addEventListener("resize", () => {
+    // Window "resize" and a ResizeObserver on the frame are complementary:
+    // some viewport-size changes (e.g. certain DevTools device-toolbar
+    // drags) only trigger one or the other.
+    function refit() {
       fitMount(mount);
       render(nodes, 0, mount.clientWidth / VIEW.w || scale);
-    });
+    }
+    window.addEventListener("resize", refit);
+    new ResizeObserver(refit).observe(mount.parentElement);
   }
 
   document.querySelectorAll("[data-sparkle-thumb]").forEach(init);

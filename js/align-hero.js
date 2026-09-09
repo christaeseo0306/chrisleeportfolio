@@ -62,8 +62,13 @@ function alignWhenReady() {
 
 window.addEventListener("load", alignWhenReady);
 
+// Window "resize" and a ResizeObserver on the document are complementary:
+// some viewport-size changes (e.g. certain DevTools device-toolbar drags)
+// only trigger one or the other, so both are wired to the same debounce.
 let resizeTimer;
-window.addEventListener("resize", () => {
+function scheduleHeroAlign() {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(alignWhenReady, 150);
-});
+}
+window.addEventListener("resize", scheduleHeroAlign);
+new ResizeObserver(scheduleHeroAlign).observe(document.documentElement);
