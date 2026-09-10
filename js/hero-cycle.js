@@ -1,11 +1,12 @@
 /**
- * Cycles the hero tagline through a list of phrases. The star spins off to
- * the left, masking the phrase as it passes over it (the text is clipped
- * to whatever is left of the star's current position, each frame, so it
- * looks erased by the star rather than just disappearing). The phrase then
- * swaps behind the star, which spins back to the right, unmasking the new
- * phrase the same way it masked the old one. Disabled under
- * prefers-reduced-motion (shows the first phrase, static).
+ * Cycles the hero tagline through a list of phrases. The star spins as it
+ * moves off to the left, masking the phrase as it passes over it (the text
+ * is clipped to whatever is left of the star's current position, each
+ * frame, so it looks erased by the star rather than just disappearing).
+ * The phrase then swaps behind the star, which glides back to the right —
+ * no longer spinning — unmasking the new phrase the same way it masked the
+ * old one. Disabled under prefers-reduced-motion (shows the first phrase,
+ * static).
  */
 (function () {
   const PHRASES = [
@@ -63,7 +64,7 @@
     // masking the phrase as it goes.
     const leftTravel = wrap.getBoundingClientRect().width;
     star.style.transition = `transform ${LEFT_MS}ms ${EASE}`;
-    star.style.transform = `translateX(-${leftTravel}px) rotate(-180deg)`;
+    star.style.transform = `translateX(-${leftTravel}px) rotate(-360deg)`;
 
     driveMask(LEFT_MS, () => {
       text.style.clipPath = "inset(0 100% 0 0)"; // fully masked, guard against a stray frame
@@ -78,9 +79,11 @@
       const shift = star.offsetLeft - beforeLeft;
 
       star.style.transition = "none";
-      star.style.transform = `translateX(${-leftTravel - shift}px) rotate(-180deg)`;
+      star.style.transform = `translateX(${-leftTravel - shift}px) rotate(-360deg)`;
       void star.offsetWidth; // flush before re-enabling the transition
 
+      // Glide back without spinning further — the rotation already
+      // finished during the leftward trip.
       star.style.transition = `transform ${RIGHT_MS}ms ${EASE}`;
       star.style.transform = "translateX(0) rotate(-360deg)";
 
