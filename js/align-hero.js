@@ -7,6 +7,7 @@ function alignHeroToNav() {
   if (!window.matchMedia("(min-width: 901px)").matches) {
     hero.style.marginBottom = "";
     hero.style.lineHeight = "";
+    window.dispatchEvent(new Event("hero-aligned"));
     return;
   }
 
@@ -48,6 +49,7 @@ function alignHeroToNav() {
       hero.style.lineHeight = String(Math.max(1, 1.3 * ratio));
     }
     hero.style.marginBottom = delta + "px";
+    window.dispatchEvent(new Event("hero-aligned"));
   });
 }
 
