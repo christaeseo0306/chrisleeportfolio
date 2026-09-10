@@ -25,10 +25,13 @@ function settleReveal(el) {
 
 function alignScrollTo(id, behavior) {
   const target = document.getElementById(id);
-  const nav = document.querySelector(".sidebar__nav");
-  if (!target || !nav) return false;
+  // Align to the sidebar's own top (where the photo sits), not the nav box
+  // further down inside it — the section heading should land level with
+  // the top of the sidebar, matching where the page starts.
+  const sidebar = document.querySelector(".sidebar");
+  if (!target || !sidebar) return false;
   settleReveal(target);
-  const delta = target.getBoundingClientRect().top - nav.getBoundingClientRect().top;
+  const delta = target.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
   window.scrollBy({ top: delta, behavior });
   return true;
 }
@@ -44,9 +47,9 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 // A link to another page's anchor (e.g. "index.html#other-stuff") lands here
 // via a normal navigation with the hash already in the URL, so the browser
 // does its own instant, un-aligned jump before any of our JS runs. Redo it
-// against the nav's real position once the hero/layout has settled — align-
-// hero.js dispatches "hero-aligned" once its own adjustments (which shift
-// everything below the hero, including these targets) are done.
+// against the sidebar's top once the hero/layout has settled — align-hero.js
+// dispatches "hero-aligned" once its own adjustments (which shift everything
+// below the hero, including these targets) are done.
 let hashAligned = false;
 function alignToHashOnce() {
   if (hashAligned || !incomingHash) return;
