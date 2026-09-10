@@ -167,11 +167,14 @@
     const theme = mount.dataset.theme === "dark" ? "dark" : "light";
     const accent = mount.dataset.accent || "#2C6EF2";
     const showCursor = mount.dataset.showCursor !== "false";
+    const transparent = mount.dataset.transparent === "true";
     const tokens = TOKENS[theme];
 
     mount.style.position = "relative";
     mount.style.overflow = "hidden";
-    mount.style.background = tokens.backdrop;
+    // Transparent skips the component's own backdrop/gradient so the site's
+    // .project__frame grey shows through instead of an approximated color.
+    mount.style.background = transparent ? "transparent" : tokens.backdrop;
 
     const stage = el("div", {
       position: "absolute",
@@ -183,7 +186,9 @@
     });
     mount.appendChild(stage);
 
-    stage.appendChild(el("div", { position: "absolute", inset: "0", background: tokens.gradient }));
+    if (!transparent) {
+      stage.appendChild(el("div", { position: "absolute", inset: "0", background: tokens.gradient }));
+    }
 
     // phone screen
     const screen = el("div", {
