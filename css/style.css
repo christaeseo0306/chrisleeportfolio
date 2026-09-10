@@ -165,6 +165,33 @@ img {
   height: 18px;
 }
 
+.hero__tagline .star img.is-spinning {
+  animation: hero-star-spin 0.5s ease;
+}
+
+@keyframes hero-star-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__tagline .star img.is-spinning {
+    animation: none;
+  }
+}
+
+[data-hero-cycle] {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+[data-hero-cycle] span {
+  display: inline-block;
+}
+
 .hero__body p {
   margin: 0;
 }

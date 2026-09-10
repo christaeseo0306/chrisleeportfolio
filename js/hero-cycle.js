@@ -1,7 +1,9 @@
 /**
- * Typewriter-cycles the hero tagline through a list of phrases: types one
- * out, holds, deletes it, pauses, then types the next — looping forever.
- * Disabled under prefers-reduced-motion (shows the first phrase, static).
+ * Smoothly cycles the hero tagline through a list of phrases: holds, then
+ * crossfades to the next phrase while the container width eases to match
+ * (so the star at the end glides over rather than jumping), spinning the
+ * star once as it moves. Disabled under prefers-reduced-motion (shows the
+ * first phrase, static).
  */
 (function () {
   const PHRASES = [
@@ -10,49 +12,67 @@
     "who reframes questions",
     "who makes things tangible",
   ];
-  const TYPE_MS = 45;
-  const DELETE_MS = 25;
   const HOLD_MS = 2200;
-  const PAUSE_MS = 400;
+  const FADE_MS = 300;
+  const WIDTH_MS = 400;
 
-  const el = document.querySelector("[data-hero-cycle]");
-  if (!el) return;
+  const wrap = document.querySelector("[data-hero-cycle]");
+  const text = document.querySelector("[data-hero-cycle-text]");
+  const star = document.querySelector(".hero__tagline .star img");
+  if (!wrap || !text) return;
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    el.textContent = PHRASES[0];
+    text.textContent = PHRASES[0];
     return;
   }
 
-  let phraseIndex = 0;
-  let charIndex = PHRASES[0].length;
+  text.style.transition = `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`;
+  wrap.style.transition = `width ${WIDTH_MS}ms ease`;
 
-  function type() {
-    const phrase = PHRASES[phraseIndex];
-    charIndex++;
-    el.textContent = phrase.slice(0, charIndex);
-    if (charIndex < phrase.length) {
-      setTimeout(type, TYPE_MS);
-    } else {
-      setTimeout(startDelete, HOLD_MS);
-    }
+  let index = 0;
+
+  function next() {
+    index = (index + 1) % PHRASES.length;
+
+    // Fade the current phrase out.
+    text.style.opacity = "0";
+    text.style.transform = "translateY(6px)";
+
+    setTimeout(() => {
+      // Pin the container at its current width so there's something to
+      // animate from, swap the text, measure the new natural width, then
+      // ease over to it.
+      const startWidth = wrap.getBoundingClientRect().width;
+      wrap.style.transition = "none";
+      wrap.style.width = startWidth + "px";
+
+      text.textContent = PHRASES[index];
+      wrap.style.width = "auto";
+      const targetWidth = wrap.getBoundingClientRect().width;
+      wrap.style.width = startWidth + "px";
+      void wrap.offsetWidth; // flush before re-enabling the transition
+      wrap.style.transition = `width ${WIDTH_MS}ms ease`;
+      wrap.style.width = targetWidth + "px";
+
+      if (star) {
+        star.classList.remove("is-spinning");
+        void star.offsetWidth;
+        star.classList.add("is-spinning");
+      }
+
+      text.style.transform = "translateY(-6px)";
+      void text.offsetWidth;
+      text.style.opacity = "1";
+      text.style.transform = "translateY(0)";
+
+      setTimeout(next, HOLD_MS);
+    }, FADE_MS);
   }
 
-  function startDelete() {
-    charIndex = PHRASES[phraseIndex].length;
-    del();
+  if (star) {
+    star.addEventListener("animationend", () => star.classList.remove("is-spinning"));
   }
 
-  function del() {
-    charIndex--;
-    el.textContent = PHRASES[phraseIndex].slice(0, charIndex);
-    if (charIndex > 0) {
-      setTimeout(del, DELETE_MS);
-    } else {
-      phraseIndex = (phraseIndex + 1) % PHRASES.length;
-      setTimeout(type, PAUSE_MS);
-    }
-  }
-
-  el.textContent = PHRASES[0];
-  setTimeout(startDelete, HOLD_MS);
+  text.textContent = PHRASES[0];
+  setTimeout(next, HOLD_MS);
 })();
