@@ -1,8 +1,8 @@
 /**
- * Smoothly cycles the hero tagline through a list of phrases: holds, then
- * crossfades to the next phrase while the container width eases to match
- * (so the star at the end glides over rather than jumping), spinning the
- * star once as it moves. Disabled under prefers-reduced-motion (shows the
+ * Cycles the hero tagline through a list of phrases. The text itself never
+ * moves — it swaps instantly. The star does the flourish: spins off to the
+ * left, the phrase swaps behind it, then it spins back to rest at the right
+ * edge of the new phrase. Disabled under prefers-reduced-motion (shows the
  * first phrase, static).
  */
 (function () {
@@ -13,64 +13,54 @@
     "who makes things tangible",
   ];
   const HOLD_MS = 2200;
-  const FADE_MS = 300;
-  const WIDTH_MS = 400;
+  const LEFT_MS = 350;
+  const RIGHT_MS = 350;
+  const EASE = "ease-in-out";
 
   const wrap = document.querySelector("[data-hero-cycle]");
   const text = document.querySelector("[data-hero-cycle-text]");
   const star = document.querySelector(".hero__tagline .star img");
-  if (!wrap || !text) return;
+  if (!wrap || !text || !star) return;
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     text.textContent = PHRASES[0];
     return;
   }
 
-  text.style.transition = `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`;
-  wrap.style.transition = `width ${WIDTH_MS}ms ease`;
+  star.style.position = "relative";
 
   let index = 0;
 
   function next() {
     index = (index + 1) % PHRASES.length;
 
-    // Fade the current phrase out.
-    text.style.opacity = "0";
-    text.style.transform = "translateY(6px)";
+    // Spin off to the left, roughly to where the current phrase starts.
+    const leftTravel = wrap.getBoundingClientRect().width;
+    star.style.transition = `transform ${LEFT_MS}ms ${EASE}`;
+    star.style.transform = `translateX(-${leftTravel}px) rotate(-180deg)`;
 
     setTimeout(() => {
-      // Pin the container at its current width so there's something to
-      // animate from, swap the text, measure the new natural width, then
-      // ease over to it.
-      const startWidth = wrap.getBoundingClientRect().width;
-      wrap.style.transition = "none";
-      wrap.style.width = startWidth + "px";
-
+      // Swap the text instantly — no fade, no slide — while the star is off
+      // to the side. Resizing the box shifts the star's own (untransformed)
+      // flow position, so compensate the transform instantly to avoid a
+      // visible jump, then spin back to rest from there.
+      const beforeLeft = star.offsetLeft;
       text.textContent = PHRASES[index];
       wrap.style.width = "auto";
-      const targetWidth = wrap.getBoundingClientRect().width;
-      wrap.style.width = startWidth + "px";
-      void wrap.offsetWidth; // flush before re-enabling the transition
-      wrap.style.transition = `width ${WIDTH_MS}ms ease`;
-      wrap.style.width = targetWidth + "px";
+      const shift = star.offsetLeft - beforeLeft;
 
-      if (star) {
-        star.classList.remove("is-spinning");
-        void star.offsetWidth;
-        star.classList.add("is-spinning");
-      }
+      star.style.transition = "none";
+      star.style.transform = `translateX(${-leftTravel - shift}px) rotate(-180deg)`;
+      void star.offsetWidth; // flush before re-enabling the transition
 
-      text.style.transform = "translateY(-6px)";
-      void text.offsetWidth;
-      text.style.opacity = "1";
-      text.style.transform = "translateY(0)";
+      star.style.transition = `transform ${RIGHT_MS}ms ${EASE}`;
+      star.style.transform = "translateX(0) rotate(-360deg)";
 
-      setTimeout(next, HOLD_MS);
-    }, FADE_MS);
-  }
-
-  if (star) {
-    star.addEventListener("animationend", () => star.classList.remove("is-spinning"));
+      setTimeout(() => {
+        star.style.transform = "none";
+        setTimeout(next, HOLD_MS);
+      }, RIGHT_MS);
+    }, LEFT_MS);
   }
 
   text.textContent = PHRASES[0];
