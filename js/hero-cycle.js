@@ -1,9 +1,11 @@
 /**
- * Cycles the hero tagline through a list of phrases. The text itself never
- * moves — it swaps instantly. The star does the flourish: spins off to the
- * left, the phrase swaps behind it, then it spins back to rest at the right
- * edge of the new phrase. Disabled under prefers-reduced-motion (shows the
- * first phrase, static).
+ * Cycles the hero tagline through a list of phrases. The star spins off to
+ * the left, masking the phrase as it passes over it (the text is clipped
+ * to whatever is left of the star's current position, each frame, so it
+ * looks erased by the star rather than just disappearing). The phrase then
+ * swaps behind the star, which spins back to the right, unmasking the new
+ * phrase the same way it masked the old one. Disabled under
+ * prefers-reduced-motion (shows the first phrase, static).
  */
 (function () {
   const PHRASES = [
@@ -29,21 +31,47 @@
 
   star.style.position = "relative";
 
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+  // Clips the text to whatever lies left of the star's current center, each
+  // frame, for `duration` ms — the star's edge becomes the mask boundary,
+  // so the phrase looks erased (star moving left) or drawn in (star moving
+  // right) as it passes over it, rather than just vanishing/appearing.
+  function driveMask(duration, done) {
+    const textRect = text.getBoundingClientRect();
+    const start = performance.now();
+    function frame(now) {
+      const starRect = star.getBoundingClientRect();
+      const starCenterX = starRect.left + starRect.width / 2;
+      const visible = clamp(starCenterX - textRect.left, 0, textRect.width);
+      text.style.clipPath = `inset(0 ${textRect.width - visible}px 0 0)`;
+      if (now - start < duration) {
+        requestAnimationFrame(frame);
+      } else {
+        done();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
   let index = 0;
 
   function next() {
     index = (index + 1) % PHRASES.length;
 
-    // Spin off to the left, roughly to where the current phrase starts.
+    // Spin off to the left, roughly to where the current phrase starts,
+    // masking the phrase as it goes.
     const leftTravel = wrap.getBoundingClientRect().width;
     star.style.transition = `transform ${LEFT_MS}ms ${EASE}`;
     star.style.transform = `translateX(-${leftTravel}px) rotate(-180deg)`;
 
-    setTimeout(() => {
-      // Swap the text instantly — no fade, no slide — while the star is off
-      // to the side. Resizing the box shifts the star's own (untransformed)
-      // flow position, so compensate the transform instantly to avoid a
-      // visible jump, then spin back to rest from there.
+    driveMask(LEFT_MS, () => {
+      text.style.clipPath = "inset(0 100% 0 0)"; // fully masked, guard against a stray frame
+
+      // Swap the text while fully masked. Resizing the box shifts the
+      // star's own (untransformed) flow position, so compensate the
+      // transform instantly to avoid a visible jump, then spin back from
+      // there.
       const beforeLeft = star.offsetLeft;
       text.textContent = PHRASES[index];
       wrap.style.width = "auto";
@@ -56,11 +84,12 @@
       star.style.transition = `transform ${RIGHT_MS}ms ${EASE}`;
       star.style.transform = "translateX(0) rotate(-360deg)";
 
-      setTimeout(() => {
+      driveMask(RIGHT_MS, () => {
+        text.style.clipPath = "none";
         star.style.transform = "none";
         setTimeout(next, HOLD_MS);
-      }, RIGHT_MS);
-    }, LEFT_MS);
+      });
+    });
   }
 
   text.textContent = PHRASES[0];
