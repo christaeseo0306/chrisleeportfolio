@@ -7,8 +7,8 @@
  * lifted card lands exactly on the list card's content box; re-deriving
  * them from scratch will visibly misalign the pop.
  *
- * Plays once on hover/focus (before -> sweep -> scroll -> pop), holds on
- * the final popped-card frame while hovered, resets to frame 0 on
+ * Plays once on hover/focus (enter -> before -> sweep -> scroll -> pop),
+ * holds on the final popped-card frame while hovered, resets to frame 0 on
  * mouseleave/blur. Runs one requestAnimationFrame loop per hovered
  * instance (nothing runs while at rest).
  */
@@ -49,7 +49,7 @@
     ["before", 1.2],
     ["sweep", 1.4],
     ["scroll", 2.1],
-    ["pop", 1.3],
+    ["pop", 4.2], // lift + hold ~3.1s so the detail can be read
   ];
   const CUE = {};
   let _acc = 0;
@@ -57,7 +57,7 @@
     CUE[name] = _acc;
     _acc += dur;
   }
-  const TOTAL = _acc; // 6.0s
+  const TOTAL = _acc; // 8.9s
 
   // ---------------------------------------------------------------- easing
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -105,6 +105,9 @@
   // -------------------------------------------------------------- the frame
   /** Every visible value is a pure function of `t` (authored seconds). */
   function frame(t) {
+    // Entrance: the screen lifts toward the viewer as the hover starts.
+    const enter = clamp(track(t, [0, 0.85], [0, 1], E.outCubic), 0, 1);
+
     const sweepStart = CUE.sweep - 0.1,
       sweepEnd = CUE.sweep + 1.05;
     const wipe = clamp(track(t, [sweepStart, sweepEnd], [0, 1], E.inOutQuart), 0, 1);
@@ -137,7 +140,7 @@
       clamp(track(t, [sweepEnd + 0.05, sweepEnd + 0.35], [0, 1], E.linear), 0, 1) *
       clamp(track(t, [popStart + 0.05, popStart + 0.3], [1, 0], E.linear), 0, 1);
 
-    return { wipe, dividerOn, scroll, popFade, pop, scrim, cursorX, cursorY, press, cursorOpacity };
+    return { enter, wipe, dividerOn, scroll, popFade, pop, scrim, cursorX, cursorY, press, cursorOpacity };
   }
 
   // ---------------------------------------------------------------- build
@@ -151,30 +154,41 @@
     dark: {
       backdrop: "#141517",
       gradient: "radial-gradient(120% 90% at 50% 40%, rgba(255,255,255,.07), rgba(0,0,0,0) 70%)",
-      screenShadow: "0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08)",
     },
     light: {
       backdrop: "#EDEBE7",
       gradient: "radial-gradient(120% 90% at 50% 40%, rgba(255,255,255,.9), rgba(0,0,0,0) 72%)",
-      screenShadow: "0 40px 80px rgba(30,28,24,.22), 0 0 0 1px rgba(0,0,0,.06)",
     },
   };
+
+  // Screen shadow deepens as the entrance ("enter", 0..1) progresses.
+  function screenShadow(dark, enter) {
+    const blur = 14 + enter * 26;
+    const spread = dark ? 34 + enter * 56 : 30 + enter * 50;
+    const alpha = dark ? 0.3 + enter * 0.25 : 0.12 + enter * 0.1;
+    return dark
+      ? `0 ${blur}px ${spread}px rgba(0,0,0,${alpha}), 0 0 0 1px rgba(255,255,255,.08)`
+      : `0 ${blur}px ${spread}px rgba(30,28,24,${alpha}), 0 0 0 1px rgba(0,0,0,.06)`;
+  }
 
   function build(mount) {
     const beforeSrc = mount.dataset.beforeSrc;
     const afterSrc = mount.dataset.afterSrc;
     const cardSrc = mount.dataset.cardSrc;
-    const theme = mount.dataset.theme === "dark" ? "dark" : "light";
+    const themeName = mount.dataset.theme === "dark" ? "dark" : mount.dataset.theme === "flat" ? "flat" : "light";
+    const flatColor = mount.dataset.flatColor || "#120F16";
+    const dark = themeName === "dark";
+    const flat = themeName === "flat";
     const accent = mount.dataset.accent || "#2C6EF2";
     const showCursor = mount.dataset.showCursor !== "false";
     const transparent = mount.dataset.transparent === "true";
-    const tokens = TOKENS[theme];
+    const tokens = flat ? null : TOKENS[themeName];
 
     mount.style.position = "relative";
     mount.style.overflow = "hidden";
     // Transparent skips the component's own backdrop/gradient so the site's
     // .project__frame grey shows through instead of an approximated color.
-    mount.style.background = transparent ? "transparent" : tokens.backdrop;
+    mount.style.background = transparent ? "transparent" : flat ? flatColor : tokens.backdrop;
 
     const stage = el("div", {
       position: "absolute",
@@ -186,11 +200,11 @@
     });
     mount.appendChild(stage);
 
-    if (!transparent) {
+    if (!transparent && !flat) {
       stage.appendChild(el("div", { position: "absolute", inset: "0", background: tokens.gradient }));
     }
 
-    // phone screen
+    // phone screen — lifts toward the viewer on hover start (see `enter` in render())
     const screen = el("div", {
       position: "absolute",
       left: VIEW_X + "px",
@@ -200,7 +214,7 @@
       borderRadius: "26px",
       overflow: "hidden",
       background: "#fff",
-      boxShadow: tokens.screenShadow,
+      transformOrigin: "50% 50%",
     });
     stage.appendChild(screen);
 
@@ -286,12 +300,15 @@
       stage.appendChild(cursorWrap);
     }
 
-    return { stage, afterWrap, afterImg, divider, scrim, popCard, cursorWrap, cursorHalo, cursorPad };
+    return { stage, screen, afterWrap, afterImg, divider, scrim, popCard, cursorWrap, cursorHalo, cursorPad, dark };
   }
 
   function render(nodes, t, scale) {
     nodes.stage.style.transform = `scale(${scale})`;
     const f = frame(t);
+
+    nodes.screen.style.transform = `translateY(${(1 - f.enter) * 26}px) scale(${0.93 + f.enter * 0.07})`;
+    nodes.screen.style.boxShadow = screenShadow(nodes.dark, f.enter);
 
     nodes.afterWrap.style.clipPath = `inset(0 0 0 ${(1 - f.wipe) * 100}%)`;
     nodes.afterImg.style.top = f.scroll + "px";
