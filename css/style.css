@@ -824,9 +824,13 @@ img {
     cursor: none;
   }
 
-  /* .project__frame sets its own cursor: pointer, which — being a direct
-     rule rather than an inherited one — beats body's cursor: none. The
-     glass cursor's own .over-link growth already signals "clickable". */
+  /* Links get cursor: pointer from the browser's own default stylesheet,
+     and .project__frame sets it explicitly — both are direct rules, which
+     beat body's *inherited* cursor: none. The glass cursor's own
+     .over-link growth already signals "clickable", so clear it here too. */
+  a,
+  button,
+  [role="button"],
   .project__frame {
     cursor: none;
   }
