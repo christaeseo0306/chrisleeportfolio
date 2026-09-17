@@ -41,6 +41,16 @@ a {
   color: inherit;
 }
 
+::selection {
+  background: var(--black);
+  color: var(--white);
+}
+
+::-moz-selection {
+  background: var(--black);
+  color: var(--white);
+}
+
 img {
   display: block;
   max-width: 100%;
