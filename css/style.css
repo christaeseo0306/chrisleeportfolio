@@ -824,6 +824,13 @@ img {
     cursor: none;
   }
 
+  /* .project__frame sets its own cursor: pointer, which — being a direct
+     rule rather than an inherited one — beats body's cursor: none. The
+     glass cursor's own .over-link growth already signals "clickable". */
+  .project__frame {
+    cursor: none;
+  }
+
   input,
   textarea,
   [contenteditable] {
