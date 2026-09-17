@@ -52,6 +52,8 @@ img {
 }
 
 .page {
+  max-width: 1600px;
+  margin: 0 auto;
   padding: 60px 30px 80px;
   display: grid;
   grid-template-columns: 1fr;
@@ -238,6 +240,11 @@ img {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.project__frame:hover {
+  background-color: #e0e0e0;
 }
 
 .project__frame img.project__shot {
