@@ -117,6 +117,16 @@ img {
   text-decoration: underline;
 }
 
+.sidebar__credit {
+  /* .sidebar's flex gap is 22px; pull up so this sits 14px below the nav. */
+  margin: -8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--line);
+  text-align: center;
+  font-style: italic;
+}
+
 /* Main content */
 .main {
   display: flex;
@@ -743,6 +753,10 @@ img {
 
   .sidebar__nav {
     padding: 20px 24px;
+  }
+
+  .sidebar__credit {
+    display: none;
   }
 
   .hero {
