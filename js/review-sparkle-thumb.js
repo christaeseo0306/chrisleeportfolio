@@ -8,6 +8,9 @@
  *
  * Plays on hover/focus, holds frame 0 at rest. Runs one requestAnimationFrame
  * loop per hovered instance (nothing runs while at rest).
+ *
+ * At/under 576px (small phone widths, where hover doesn't apply) it instead
+ * autoplays on a continuous loop, independent of pointer events.
  */
 (function () {
   // ---------------------------------------------------------------- geometry
@@ -377,7 +380,10 @@
       raf = requestAnimationFrame(step);
     }
 
+    const isMobile = () => window.matchMedia("(max-width: 576px)").matches;
+
     function stop() {
+      if (isMobile()) return; // keeps looping regardless of pointer events
       live = false;
       cancelAnimationFrame(raf);
       render(nodes, 0, mount.clientWidth / VIEW.w || scale);
@@ -398,6 +404,18 @@
     }
     window.addEventListener("resize", refit);
     new ResizeObserver(refit).observe(mount.parentElement);
+
+    // Autoplay/loop on mobile — no hover to trigger it there. Re-check on
+    // resize so crossing the breakpoint starts or stops it correctly.
+    function syncMobileAutoplay() {
+      if (isMobile()) {
+        play();
+      } else if (live && !target.matches(":hover") && document.activeElement !== target) {
+        stop();
+      }
+    }
+    syncMobileAutoplay();
+    window.addEventListener("resize", syncMobileAutoplay);
   }
 
   document.querySelectorAll("[data-sparkle-thumb]").forEach(init);

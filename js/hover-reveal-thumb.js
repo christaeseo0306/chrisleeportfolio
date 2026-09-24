@@ -11,6 +11,9 @@
  * holds on the final popped-card frame while hovered, resets to frame 0 on
  * mouseleave/blur. Runs one requestAnimationFrame loop per hovered
  * instance (nothing runs while at rest).
+ *
+ * At/under 576px (small phone widths, where hover doesn't apply) it instead
+ * autoplays on a continuous loop, independent of pointer events.
  */
 (function () {
   // ---------------------------------------------------------------- layout
@@ -365,16 +368,24 @@
 
     render(nodes, 0, scale);
 
+    const isMobile = () => window.matchMedia("(max-width: 576px)").matches;
+
     // Plays once and holds on the final (popped-card) frame while hovered —
     // unlike a looping thumbnail, it does not wrap back to t=0 on its own.
+    // On mobile (no hover to hold on) it loops continuously instead.
     function step(now) {
-      const t = (now - started) / 1000;
-      if (t >= TOTAL) {
+      const elapsed = (now - started) / 1000;
+      if (isMobile()) {
+        render(nodes, elapsed % TOTAL, mount.clientWidth / W || scale);
+        raf = requestAnimationFrame(step);
+        return;
+      }
+      if (elapsed >= TOTAL) {
         render(nodes, TOTAL, mount.clientWidth / W || scale);
         raf = 0;
         return;
       }
-      render(nodes, t, mount.clientWidth / W || scale);
+      render(nodes, elapsed, mount.clientWidth / W || scale);
       raf = requestAnimationFrame(step);
     }
 
@@ -388,6 +399,7 @@
     }
 
     function stop() {
+      if (isMobile()) return; // keeps looping regardless of pointer events
       live = false;
       cancelAnimationFrame(raf);
       raf = 0;
@@ -409,6 +421,18 @@
     }
     window.addEventListener("resize", refit);
     new ResizeObserver(refit).observe(mount.parentElement);
+
+    // Autoplay/loop on mobile; re-check on resize so crossing the
+    // breakpoint (device rotation, DevTools) starts or stops it correctly.
+    function syncMobileAutoplay() {
+      if (isMobile()) {
+        play();
+      } else if (live && !target.matches(":hover") && document.activeElement !== target) {
+        stop();
+      }
+    }
+    syncMobileAutoplay();
+    window.addEventListener("resize", syncMobileAutoplay);
   }
 
   document.querySelectorAll("[data-hover-reveal]").forEach(init);
