@@ -325,6 +325,12 @@ img {
   object-fit: cover;
 }
 
+@media (max-width: 576px) {
+  .phone-outline {
+    border-width: 5px;
+  }
+}
+
 .project__meta {
   display: flex;
   gap: 10px;
