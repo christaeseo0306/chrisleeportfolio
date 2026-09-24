@@ -389,6 +389,20 @@ img {
   width: 100%;
 }
 
+.other-stuff__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  width: 100%;
+}
+
+.other-stuff__section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
 .other-stuff__subhead {
   font-family: var(--serif);
   font-size: clamp(24px, 3vw, 40px);
@@ -449,6 +463,136 @@ img {
 .other-stuff__item .links a {
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.colleague-quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+.colleague-quotes__viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.colleague-quotes__track {
+  display: flex;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.colleague-quotes__item {
+  flex: 0 0 380px;
+  width: 380px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding-right: 60px;
+  min-height: 260px;
+}
+
+.colleague-quotes__avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.colleague-quotes__text {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.colleague-quotes__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.colleague-quotes__meta .name {
+  font-size: 24px;
+  margin: 0;
+}
+
+.colleague-quotes__meta .title {
+  font-size: 15px;
+  margin: 0;
+}
+
+.colleague-quotes__text .quote {
+  font-size: 15px;
+  margin: 0;
+}
+
+.colleague-quotes__controls {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.colleague-quotes__rail {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  position: relative;
+}
+
+.colleague-quotes__bar {
+  position: absolute;
+  top: -0.5px;
+  height: 2px;
+  background: var(--black);
+  transition: left 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), width 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.colleague-quotes__arrows {
+  display: flex;
+  gap: 32px;
+  flex-shrink: 0;
+}
+
+.colleague-quotes__arrow {
+  border: none;
+  background: none;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  color: var(--black);
+  cursor: pointer;
+  transition: opacity 0.25s;
+}
+
+.colleague-quotes__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.colleague-quotes__arrow-shaft {
+  height: 1.4px;
+  background: currentColor;
+  width: 20px;
+  transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.colleague-quotes__arrow:not(:disabled):hover .colleague-quotes__arrow-shaft {
+  width: 44px;
+}
+
+.colleague-quotes__arrow--prev .colleague-quotes__arrow-shaft {
+  margin-left: -6.5px;
+}
+
+.colleague-quotes__arrow--next .colleague-quotes__arrow-shaft {
+  margin-right: -6.5px;
+}
+
+.colleague-quotes__arrow:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 4px;
 }
 
 /* Experiential design grid */
@@ -810,6 +954,24 @@ img {
   }
 
   .other-stuff__photo {
+    display: none;
+  }
+
+  .colleague-quotes__track {
+    flex-direction: column;
+    gap: 32px;
+    transform: none !important;
+  }
+
+  .colleague-quotes__item {
+    flex: 1 1 auto;
+    width: 100%;
+    padding-right: 0;
+    border-right: none;
+    min-height: 0;
+  }
+
+  .colleague-quotes__controls {
     display: none;
   }
 
