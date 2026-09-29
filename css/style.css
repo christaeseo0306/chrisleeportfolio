@@ -681,6 +681,22 @@ img {
   height: auto;
 }
 
+.events__videos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  width: 100%;
+}
+
+.events__video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 20px;
+  display: block;
+  background: var(--grey);
+}
+
 /* Footer CTA */
 .footer-cta {
   font-family: var(--serif);
@@ -1017,6 +1033,10 @@ img {
     grid-column: 1;
     aspect-ratio: auto;
     height: 260px;
+  }
+
+  .events__videos {
+    grid-template-columns: 1fr;
   }
 
   .project__frame--phone .phone-outline,
