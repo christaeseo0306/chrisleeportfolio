@@ -4,6 +4,14 @@ function alignHeroToNav() {
   const projects = document.querySelector(".projects");
   if (!hero || !nav || !projects) return;
 
+  // The shrinking sidebar (body.compact) changes .sidebar__nav's position on
+  // scroll, which resizes document.documentElement and re-triggers the
+  // ResizeObserver below. Re-aligning against the compact nav's position
+  // produces a wrong (often negative) hero margin-bottom, collapsing the
+  // gap above "Projects". The alignment is only meaningful against the
+  // sidebar's resting (non-compact) size, so skip it while compact.
+  if (document.body.classList.contains("compact")) return;
+
   if (!window.matchMedia("(min-width: 901px)").matches) {
     hero.style.marginBottom = "";
     hero.style.lineHeight = "";
