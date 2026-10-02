@@ -8,6 +8,7 @@
   --white: #fff;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --side: clamp(250px, 22vw, 322px);
 }
 
 * {
@@ -74,10 +75,20 @@ img {
   position: fixed;
   top: 60px;
   left: 30px;
-  width: clamp(250px, 22vw, 322px);
+  width: var(--side);
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+
+.sidebar,
+.sidebar__photo,
+.sidebar__nav,
+.sidebar__nav a,
+.sidebar__credit {
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    gap 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), font-size 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .sidebar__photo {
@@ -127,12 +138,54 @@ img {
   font-style: italic;
 }
 
+@media (min-width: 901px) {
+  body.compact {
+    --side: 168px;
+  }
+
+  body.compact .sidebar {
+    gap: 12px;
+  }
+
+  body.compact .sidebar__photo {
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  body.compact .sidebar__nav {
+    padding: 14px 18px;
+    gap: 5px;
+    border-radius: 16px;
+  }
+
+  body.compact .sidebar__nav a {
+    font-size: 14px;
+  }
+
+  body.compact .sidebar__credit {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main,
+  .sidebar,
+  .sidebar__photo,
+  .sidebar__nav,
+  .sidebar__nav a,
+  .sidebar__credit {
+    transition: none;
+  }
+}
+
 /* Main content */
 .main {
   display: flex;
   flex-direction: column;
   gap: 87px;
-  margin-left: calc(clamp(250px, 22vw, 322px) + 20px);
+  margin-left: calc(var(--side) + 20px);
+  transition: margin-left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   /* Without this, .main (a grid item) defaults to min-width:auto, which
      lets .project__frame's aspect-ratio+max-height inflate its min-content
      size and get stuck there across a resize, overflowing the page. */
