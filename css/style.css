@@ -109,6 +109,38 @@ img {
   object-position: center 30%;
 }
 
+/* The photo spins down into the site's star mark once the reader scrolls past
+   the intro (body.compact), and grows back without spinning.
+
+   margin-inline is centred in both states. It has to live here rather than on
+   body.compact: margin:auto can't animate, so declaring it only on the compact
+   state made it snap auto -> 0 on the way back and the photo grew out of the
+   left edge. With width:100% above, auto margins resolve to 0, so the
+   full-size box is unchanged — but the shrunken one stays centred as the width
+   animates. */
+.sidebar__photo {
+  transform-origin: center;
+  margin-inline: auto;
+  /* star -> photo: grow only, no spin. transform is deliberately left out of
+     the transition so it snaps 360deg -> 0deg, which is visually identical. */
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease;
+}
+
+.sidebar__photo img:not(.sidebar__star) {
+  transition: opacity 0.3s ease;
+}
+
+.sidebar__photo .sidebar__star {
+  width: 64%;
+  height: 64%;
+  inset: 18%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.28s ease, transform 0.45s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
 .sidebar__nav {
   background: var(--grey);
   border-radius: 20px;
@@ -148,8 +180,26 @@ img {
   }
 
   body.compact .sidebar__photo {
-    width: 100%;
-    border-radius: 16px;
+    width: 52px;
+    border-radius: 50%;
+    background: transparent;
+    transform: rotate(360deg);
+    /* photo -> star: width leads on a fast-out curve so the full-size photo
+       doesn't sweep across the hero text, and the spin trails a little longer. */
+    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease,
+      transform 0.7s cubic-bezier(0.3, 0.85, 0.25, 1);
+  }
+
+  body.compact .sidebar__photo img:not(.sidebar__star) {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  body.compact .sidebar__photo .sidebar__star {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.2s;
   }
 
   body.compact .sidebar__nav {
@@ -172,10 +222,16 @@ img {
   .main,
   .sidebar,
   .sidebar__photo,
+  .sidebar__photo img,
   .sidebar__nav,
   .sidebar__nav a,
   .sidebar__credit {
     transition: none;
+  }
+
+  /* no spin when motion is reduced: the swap still happens, just instantly */
+  body.compact .sidebar__photo {
+    transform: none;
   }
 }
 
