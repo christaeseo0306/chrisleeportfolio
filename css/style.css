@@ -527,6 +527,7 @@ img {
 }
 
 .other-stuff__photo {
+  position: relative;
   width: 237px;
   flex-shrink: 0;
   align-self: stretch;
@@ -535,7 +536,16 @@ img {
   background: var(--grey);
 }
 
+/* The image is taken out of flow on purpose. This box has no height of its own
+   — it gets one from align-self:stretch — so a percentage height on the image
+   resolves against an indefinite parent. Safari fed that back into the flex
+   line's cross size and the photo grew to roughly twice the list's height,
+   with object-fit blowing the crop up to match. Absolute positioning removes
+   the percentage entirely, so the height comes only from the stretch. Same
+   pattern .sidebar__photo already uses. */
 .other-stuff__photo img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
