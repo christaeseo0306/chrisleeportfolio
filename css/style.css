@@ -131,6 +131,9 @@ img {
   transition: opacity 0.3s ease;
 }
 
+/* The entrance pop rides on transform; hover uses the standalone scale
+   property so the two compose instead of overwriting each other, and so the
+   hover can have its own short timing. */
 .sidebar__photo .sidebar__star {
   width: 64%;
   height: 64%;
@@ -138,7 +141,8 @@ img {
   object-fit: contain;
   opacity: 0;
   transform: scale(0.3);
-  transition: opacity 0.28s ease, transform 0.45s cubic-bezier(0.2, 1.5, 0.4, 1);
+  transition: opacity 0.28s ease, transform 0.45s cubic-bezier(0.2, 1.5, 0.4, 1),
+    scale 0.18s ease;
 }
 
 .sidebar__nav {
@@ -199,7 +203,13 @@ img {
   body.compact .sidebar__photo .sidebar__star {
     opacity: 1;
     transform: scale(1);
-    transition-delay: 0.2s;
+    /* opacity, transform, scale — the entrance is staggered but hover must not
+       be, or the star would lag behind the pointer leaving. */
+    transition-delay: 0.2s, 0.2s, 0s;
+  }
+
+  body.compact .sidebar__photo:hover .sidebar__star {
+    scale: 1.12;
   }
 
   body.compact .sidebar__nav {
@@ -897,6 +907,16 @@ img {
 .sidebar__name-link {
   text-decoration: none;
   color: var(--black);
+  /* The link is a full-width block, but once body.compact shrinks the photo to
+     the 52px star the rest of that row is empty space that would still be
+     clickable. Handing hit testing to the photo itself keeps the target on the
+     star; the click still bubbles up to the link. */
+  pointer-events: none;
+}
+
+.sidebar__name-link .sidebar__photo {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* About page: bio */
