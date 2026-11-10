@@ -1,14 +1,83 @@
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
 @import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap");
 
+/* Colour is defined as roles rather than literal values so the whole palette
+   can flip for dark mode in one place. --black/--white/--grey/--line are kept
+   as aliases because the rest of the sheet already uses them, but they mean
+   "foreground" and "background" — in dark mode --black is light. */
 :root {
-  --grey: #ededed;
-  --line: rgba(0, 0, 0, 0.4);
-  --black: #000;
-  --white: #fff;
+  color-scheme: light;
+
+  --bg: #fff;
+  --fg: #000;
+  --surface: #ededed;
+  --surface-hover: #e0e0e0;
+  --muted: rgba(0, 0, 0, 0.4);
+  --muted-strong: rgba(0, 0, 0, 0.55);
+  --hairline: rgba(0, 0, 0, 0.22);
+  --shadow-card: rgba(0, 0, 0, 0.15);
+  --shadow-shot: rgba(145, 145, 145, 0.25);
+  --phone-outline: rgba(176, 176, 176, 0.4);
+  --star-filter: none;
+  --ring-fill: rgba(0, 0, 0, 0.05);
+  --ring-fill-hover: rgba(0, 0, 0, 0.08);
+  --ring-fill-press: rgba(0, 0, 0, 0.16);
+  --ring-sheen: rgba(255, 255, 255, 0.7);
+
+  --grey: var(--surface);
+  --line: var(--muted);
+  --black: var(--fg);
+  --white: var(--bg);
+
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --side: clamp(250px, 22vw, 322px);
+}
+
+/* Dark values live in one block, pulled in by either the OS preference or an
+   explicit choice. The media query is scoped to :not([data-theme="light"]) so
+   picking light in the toggle still wins on a dark OS. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #0f0f10;
+    --fg: #ededee;
+    --surface: #1b1b1d;
+    --surface-hover: #242427;
+    --muted: rgba(255, 255, 255, 0.42);
+    --muted-strong: rgba(255, 255, 255, 0.62);
+    --hairline: rgba(255, 255, 255, 0.22);
+    --shadow-card: rgba(0, 0, 0, 0.55);
+    --shadow-shot: rgba(0, 0, 0, 0.45);
+    --phone-outline: rgba(255, 255, 255, 0.22);
+    --ring-fill: rgba(255, 255, 255, 0.08);
+    --ring-fill-hover: rgba(255, 255, 255, 0.13);
+    --ring-fill-press: rgba(255, 255, 255, 0.22);
+    --ring-sheen: rgba(255, 255, 255, 0.18);
+    /* star.svg is a solid black path, so it has to be flipped to stay visible */
+    --star-filter: invert(1);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0f0f10;
+  --fg: #ededee;
+  --surface: #1b1b1d;
+  --surface-hover: #242427;
+  --muted: rgba(255, 255, 255, 0.42);
+  --muted-strong: rgba(255, 255, 255, 0.62);
+  --hairline: rgba(255, 255, 255, 0.22);
+  --shadow-card: rgba(0, 0, 0, 0.55);
+  --shadow-shot: rgba(0, 0, 0, 0.45);
+  --phone-outline: rgba(255, 255, 255, 0.22);
+  --ring-fill: rgba(255, 255, 255, 0.08);
+  --ring-fill-hover: rgba(255, 255, 255, 0.13);
+  --ring-fill-press: rgba(255, 255, 255, 0.22);
+  --ring-sheen: rgba(255, 255, 255, 0.18);
+  --star-filter: invert(1);
 }
 
 * {
@@ -113,11 +182,11 @@ img {
    the intro (body.compact), and grows back without spinning.
 
    margin-inline is centred in both states. It has to live here rather than on
-   body.compact: margin:auto can't animate, so declaring it only on the compact
-   state made it snap auto -> 0 on the way back and the photo grew out of the
-   left edge. With width:100% above, auto margins resolve to 0, so the
-   full-size box is unchanged — but the shrunken one stays centred as the width
-   animates. */
+   body.compact:
+   margin:auto can't animate, so declaring it only on the compact state made it
+   snap auto -> 0 on the way back and the photo grew out of the left edge. With
+   width:100% above, auto margins resolve to 0, so the full-size box is
+   unchanged — but the shrunken one stays centred as the width animates. */
 .sidebar__photo {
   transform-origin: center;
   margin-inline: auto;
@@ -139,6 +208,7 @@ img {
   height: 64%;
   inset: 18%;
   object-fit: contain;
+  filter: var(--star-filter);
   opacity: 0;
   transform: scale(0.3);
   transition: opacity 0.28s ease, transform 0.45s cubic-bezier(0.2, 1.5, 0.4, 1),
@@ -172,6 +242,107 @@ img {
   color: var(--line);
   text-align: center;
   font-style: italic;
+}
+
+/* Theme switch. The track is 52x28 with the knob inset 3px, so its travel is
+   52 - 22 - (3 * 2) = 24px. The knob carries the icon for the *current* mode:
+   sun while light, moon while dark. */
+.sidebar__theme {
+  box-sizing: border-box;
+  position: relative;
+  width: 52px;
+  height: 28px;
+  flex: none;
+  margin-inline: auto;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.sidebar__theme-knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: var(--fg);
+  color: var(--bg);
+  display: grid;
+  place-items: center;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Both icons are stacked in the knob and cross-faded, so neither reflows it. */
+.sidebar__theme-knob svg {
+  grid-area: 1 / 1;
+  width: 13px;
+  height: 13px;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar__theme-moon {
+  opacity: 0;
+}
+
+.sidebar__theme:hover {
+  border-color: var(--muted);
+}
+
+.sidebar__theme:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 3px;
+}
+
+:root[data-theme="dark"] .sidebar__theme-knob {
+  transform: translateX(24px);
+}
+:root[data-theme="dark"] .sidebar__theme-sun {
+  opacity: 0;
+}
+:root[data-theme="dark"] .sidebar__theme-moon {
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sidebar__theme-knob {
+    transform: translateX(24px);
+  }
+  :root:not([data-theme="light"]) .sidebar__theme-sun {
+    opacity: 0;
+  }
+  :root:not([data-theme="light"]) .sidebar__theme-moon {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar__theme,
+  .sidebar__theme-knob,
+  .sidebar__theme-knob svg {
+    transition: none;
+  }
+}
+
+/* Desktop sidebar: the credit line sits just under the nav, and the theme
+   toggle is parked at the bottom of the viewport rather than trailing it. */
+@media (min-width: 861px) {
+  /* Anchoring both edges gives the column a height for the auto margin below
+     to work against. If the content is ever taller the margin collapses to 0,
+     so nothing gets clipped. */
+  /* 30px matches the sidebar's own left inset, so the toggle sits as close to
+     the bottom edge as the column does to the left one. */
+  .sidebar {
+    bottom: 30px;
+  }
+
+  .sidebar__theme {
+    margin-top: auto;
+  }
 }
 
 @media (min-width: 901px) {
@@ -304,6 +475,7 @@ img {
 .hero__tagline .star img {
   width: 18px;
   height: 18px;
+  filter: var(--star-filter);
 }
 
 [data-hero-cycle] {
@@ -383,13 +555,13 @@ img {
 }
 
 .project__frame:hover {
-  background-color: #e0e0e0;
+  background-color: var(--surface-hover);
 }
 
 .project__frame img.project__shot {
   max-width: 46%;
   border-radius: 4px;
-  box-shadow: 0 6px 39px 6px rgba(145, 145, 145, 0.25);
+  box-shadow: 0 6px 39px 6px var(--shadow-shot);
 }
 
 .sparkle-thumb-mount {
@@ -414,7 +586,7 @@ img {
   transition: top 0.4s ease, transform 0.4s ease;
   width: 39%;
   aspect-ratio: 407 / 882;
-  border: 10.858px solid rgba(176, 176, 176, 0.4);
+  border: 10.858px solid var(--phone-outline);
   border-radius: 32.6px;
   overflow: hidden;
 }
@@ -537,7 +709,6 @@ img {
 }
 
 .other-stuff__photo {
-  position: relative;
   width: 237px;
   flex-shrink: 0;
   align-self: stretch;
@@ -546,16 +717,7 @@ img {
   background: var(--grey);
 }
 
-/* The image is taken out of flow on purpose. This box has no height of its own
-   — it gets one from align-self:stretch — so a percentage height on the image
-   resolves against an indefinite parent. Safari fed that back into the flex
-   line's cross size and the photo grew to roughly twice the list's height,
-   with object-fit blowing the crop up to match. Absolute positioning removes
-   the percentage entirely, so the height comes only from the stretch. Same
-   pattern .sidebar__photo already uses. */
 .other-stuff__photo img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -875,7 +1037,7 @@ img {
   border-radius: 20px;
   padding: 40px;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--muted-strong);
 }
 
 .content .stack {
@@ -999,7 +1161,7 @@ img {
   height: var(--h);
   object-fit: cover;
   border-radius: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px var(--shadow-card);
 }
 
 /* Scroll reveal */
@@ -1231,11 +1393,11 @@ img {
     height: 34px;
     margin: -17px 0 0 -17px;
     border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.22);
-    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--hairline);
+    background: var(--ring-fill);
     backdrop-filter: blur(3px) saturate(1.4);
     -webkit-backdrop-filter: blur(3px) saturate(1.4);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7), 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 1px var(--ring-sheen), 0 2px 8px rgba(0, 0, 0, 0.08);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.2s, width 0.16s cubic-bezier(0.2, 0.8, 0.3, 1), height 0.16s cubic-bezier(0.2, 0.8, 0.3, 1),
@@ -1250,7 +1412,7 @@ img {
     width: 54px;
     height: 54px;
     margin: -27px 0 0 -27px;
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--ring-fill-hover);
     backdrop-filter: blur(5px) saturate(1.6);
   }
 
@@ -1258,8 +1420,8 @@ img {
     width: 20px;
     height: 20px;
     margin: -10px 0 0 -10px;
-    background: rgba(0, 0, 0, 0.16);
-    border-color: rgba(0, 0, 0, 0.4);
+    background: var(--ring-fill-press);
+    border-color: var(--muted);
     backdrop-filter: blur(6px) saturate(1.8);
   }
 }
